@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sarthak Dubey | Robotics Engineer</title>
+<meta name="description" content="Sarthak Dubey: robotics engineer working on SLAM, state estimation, sensor fusion and robot hardware. MS Robotics, Northeastern University.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#E9E9E4; --ink:#1B2430; --steel:#5E6873; --alu:#C9CCC6; --signal:#F5C400;
+    --line:rgba(27,36,48,.18); --pad:clamp(1.1rem,4vw,3rem);
+    --ease:cubic-bezier(.2,.75,.15,1);
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *,*::before,*::after{box-sizing:inherit}
+  html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 4.5rem)}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Archivo",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    font-size:1.0625rem;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit}
+  :focus-visible{outline:3px solid var(--signal);outline-offset:3px}
+
+  .display{font-family:"Archivo","Arial Narrow","Roboto Condensed","Helvetica Neue",sans-serif;
+    font-stretch:62%;font-weight:850;text-transform:uppercase;line-height:.86;letter-spacing:-.01em;margin:0}
+  .mask{display:block;overflow:hidden;padding-bottom:.04em}
+  .mask > span{display:block}
+
+  /* header */
+  header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--line)}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.85rem var(--pad);max-width:1440px;margin:0 auto}
+  .brand{font-stretch:75%;font-weight:800;text-transform:uppercase;text-decoration:none;font-size:1.1rem}
+  nav{display:flex;gap:clamp(.8rem,2vw,1.8rem);align-items:center}
+  nav a{text-decoration:none;font-weight:500;font-size:.95rem}
+  nav a:hover{text-decoration:underline;text-underline-offset:4px}
+  .progress{position:absolute;left:0;bottom:-1px;height:3px;width:100%;background:var(--signal);transform-origin:left;transform:scaleX(0)}
+  .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.05rem;border:1.5px solid var(--ink);
+    background:var(--ink);color:var(--paper);text-decoration:none;font-weight:650;font-size:.92rem;border-radius:999px;cursor:pointer;
+    transition:background .2s,color .2s,border-color .2s}
+  .btn:hover{background:var(--signal);color:var(--ink);border-color:var(--ink)}
+  .btn.ghost{background:transparent;color:var(--ink)}
+  .btn.ghost:hover{background:var(--ink);color:var(--paper)}
+  @media (max-width:640px){ nav a:not(.btn){display:none} }
+
+  /* hero: robot simulation full-bleed */
+  .hero{position:relative;background:var(--ink);color:var(--paper);overflow:hidden;
+    min-height:calc(100svh - 4.2rem);display:flex;flex-direction:column}
+  .hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .hero #robotTop{z-index:3;pointer-events:none}
+  .hero::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(to top,rgba(27,36,48,.95) 0%,rgba(27,36,48,.55) 32%,rgba(27,36,48,0) 60%)}
+  .hero-inner{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:space-between;
+    width:100%;max-width:1440px;margin:0 auto;padding:clamp(1.2rem,3vw,2rem) var(--pad) clamp(1.5rem,4vw,3rem);pointer-events:none}
+  .hero-inner a{pointer-events:auto}
+  .live{display:inline-flex;align-items:center;gap:.55rem;font-size:.88rem;color:var(--alu);
+    background:rgba(27,36,48,.7);padding:.4rem .8rem;border-radius:999px;border:1px solid rgba(201,204,198,.2);align-self:flex-start}
+  .live i{width:.55rem;height:.55rem;border-radius:50%;background:var(--signal);animation:pulse 1.6s infinite}
+  @keyframes pulse{50%{opacity:.25}}
+  .hero h1{font-size:clamp(4rem,15.2vw,16rem);margin-top:auto}
+  .hero-foot{display:flex;justify-content:space-between;align-items:flex-end;gap:1.5rem 3rem;flex-wrap:wrap;margin-top:clamp(1rem,2.5vw,2rem)}
+  .hero-foot p{margin:0;max-width:44ch;font-size:clamp(1.05rem,1.5vw,1.3rem);line-height:1.4}
+  .hero-foot p span{display:block;color:var(--alu);font-size:.85em;margin-top:.5rem}
+  .hero .actions{display:flex;flex-wrap:wrap;gap:.6rem}
+  .hero .btn{background:var(--signal);color:var(--ink);border-color:var(--signal)}
+  .hero .btn:hover{background:var(--paper);border-color:var(--paper)}
+  .hero .btn.ghost{background:transparent;color:var(--paper);border-color:var(--paper)}
+  .hero .btn.ghost:hover{background:var(--paper);color:var(--ink)}
+
+  /* marquee */
+  .band{background:var(--signal);overflow:hidden;border-bottom:2px solid var(--ink)}
+  .track{display:flex;width:max-content;will-change:transform}
+  .track span{font-family:"Archivo","Arial Narrow",sans-serif;font-stretch:62%;font-weight:850;text-transform:uppercase;font-size:clamp(2.6rem,7vw,6rem);
+    line-height:1;padding:.2em .35em;display:flex;align-items:center;gap:.35em;white-space:nowrap}
+  .track span::after{content:"";width:.32em;height:.32em;background:var(--ink);transform:rotate(45deg)}
+
+  main,footer{max-width:1440px;margin:0 auto;padding:0 var(--pad)}
+  section{padding-top:clamp(3.5rem,8vw,7rem)}
+  section > h2{font-size:clamp(3.6rem,12vw,10rem)}
+  .lede{max-width:52ch;margin:1.2rem 0 0;font-size:1.15rem}
+  .group{margin-top:clamp(2rem,4vw,3rem)}
+  .group h3{position:relative;font-stretch:75%;font-weight:750;text-transform:uppercase;font-size:1.05rem;letter-spacing:.02em;margin:0;padding-bottom:.6rem}
+  .group h3::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--ink);transform-origin:left}
+
+  .row{border-bottom:1px solid var(--line)}
+  .row-head{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,4fr) auto;gap:1rem 2rem;align-items:center;padding:1.3rem 0}
+  .row-title{font-size:clamp(1.25rem,2.2vw,1.75rem);font-weight:700;line-height:1.15;margin:0}
+  .row-kind{color:var(--steel);font-size:.95rem;margin-top:.25rem}
+  .chips{display:flex;flex-wrap:wrap;gap:.4rem}
+  .chip{font-size:.8rem;padding:.2rem .6rem;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.35)}
+  .chip.hot{background:var(--signal);border-color:var(--signal);font-weight:650}
+  .row-actions{display:flex;gap:.5rem;justify-content:flex-end}
+  summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;font-weight:600;font-size:.92rem;padding:.6rem 1.05rem;border:1.5px solid var(--ink);border-radius:999px;margin-bottom:1.3rem;transition:background .2s,color .2s}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";font-size:1.1rem;line-height:1;transition:transform .3s var(--ease)}
+  details[open] summary::after{transform:rotate(45deg)}
+  summary:hover{background:var(--ink);color:var(--paper)}
+  .row-body{padding:0 0 1.6rem}
+  details[open] .row-body{animation:drop .5s var(--ease)}
+  @keyframes drop{from{opacity:0;transform:translateY(-10px)}}
+  .row-body ul{margin:0;padding-left:1.1rem;max-width:68ch}
+  .row-body li{margin-bottom:.45rem}
+  .row-body li::marker{color:var(--steel)}
+  @media (max-width:860px){ .row-head{grid-template-columns:1fr} .row-actions{justify-content:flex-start} }
+  .row-head .row-actions:empty{display:none}
+
+  .skills{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));margin-top:2rem;border-top:2px solid var(--ink)}
+  .skills div{padding:1.2rem 1.4rem 1.4rem 0;border-bottom:1px solid var(--line)}
+  .skills dt{font-weight:700;margin-bottom:.35rem}
+  .skills dd{margin:0;color:var(--steel)}
+
+  .contact{padding-bottom:clamp(3rem,6vw,5rem)}
+  .contact .big{display:inline-block;margin-top:1.5rem;font-size:clamp(1.5rem,4.6vw,3.6rem);font-weight:700;font-stretch:80%;
+    text-decoration:none;overflow-wrap:anywhere;background:linear-gradient(var(--signal),var(--signal)) left bottom/100% 4px no-repeat;transition:background-size .9s var(--ease) .3s}
+  .contact .big:hover{background-size:100% 100%}
+  .contact .actions{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.8rem}
+  footer{border-top:1px solid var(--line);padding-block:1.3rem;font-size:.88rem;color:var(--steel);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+
+  /* ---------- scroll + load animations (only when motion is allowed) ---------- */
+  .anim [data-reveal]{opacity:0;transform:translateY(32px);
+    transition:opacity .8s var(--ease),transform .8s var(--ease);transition-delay:calc(var(--i,0) * 80ms)}
+  .anim [data-reveal].in{opacity:1;transform:none}
+  .anim [data-split] .mask > span{transform:translateY(108%);transition:transform 1s var(--ease);transition-delay:calc(var(--m,0) * 110ms)}
+  .anim [data-split].in .mask > span{transform:none}
+  .anim .group h3::after{transform:scaleX(0);transition:transform 1.1s var(--ease) .15s}
+  .anim .group h3.in::after{transform:scaleX(1)}
+  .anim .contact .big{background-size:0 4px}
+  .anim .contact .big.in{background-size:100% 4px}
+  .anim .contact .big.in:hover{background-size:100% 100%}
+  .anim .hero .live,.anim .hero-foot{opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease) .7s,transform .8s var(--ease) .7s}
+  .anim .hero.ready .live,.anim .hero.ready .hero-foot{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('anim')</script>
+
+<header>
+  <div class="bar">
+    <a class="brand" href="#top">Sarthak Dubey</a>
+    <nav aria-label="Main">
+      <a href="#work">Work</a>
+      <a href="#experience">Experience</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+      <a class="btn" href="resume.pdf" target="_blank" rel="noopener">Résumé</a>
+    </nav>
+  </div>
+  <div class="progress" aria-hidden="true"></div>
+</header>
+
+<div class="hero" id="top">
+  <canvas id="robotTop" aria-hidden="true"></canvas>
+  <canvas id="robot" role="img" aria-label="Animation: a wheeled robot drives through a dark room, sweeping a LiDAR beam and building a map of the walls and obstacles it detects."></canvas>
+  <div class="hero-inner">
+    <span class="live"><i></i>Live: a robot mapping an unknown room with LiDAR</span>
+    <h1 class="display" data-split><span class="mask"><span>Sarthak</span></span><span class="mask"><span>Dubey</span></span></h1>
+    <div class="hero-foot">
+      <p>Robotics engineer. I work on how robots figure out where they are: SLAM, sensor fusion and state estimation, plus the hardware that carries the sensors.
+        <span>MS Robotics, Northeastern University, graduating Dec 2027. Based in Boston.</span></p>
+      <div class="actions">
+        <a class="btn" href="#work">See my work</a>
+        <a class="btn ghost" href="mailto:dubey.sart@northeastern.edu">Email me</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="band" aria-hidden="true">
+  <div class="track">
+    <span>Estimate</span><span>Perceive</span><span>Build</span><span>Estimate</span><span>Perceive</span><span>Build</span>
+    <span>Estimate</span><span>Perceive</span><span>Build</span><span>Estimate</span><span>Perceive</span><span>Build</span>
+  </div>
+</div>
+
+<main>
+  <!-- WORK -->
+  <section id="work">
+    <h2 class="display">Work</h2>
+    <p class="lede">Research, course projects and competition robots. Open any project for the details.</p>
+
+    <div class="group">
+      <h3>Research</h3>
+      <div class="row">
+        <div class="row-head">
+          <div>
+            <p class="row-title">SNGR: Selective Non-Gaussian Refinement for Ambiguous SLAM Factor Graphs</p>
+            <div class="row-kind">Preprint on arXiv</div>
+          </div>
+          <div class="chips"><span class="chip hot">Paper</span><span class="chip">Python</span><span class="chip">GTSAM</span><span class="chip">iSAM2</span><span class="chip">Factor graphs</span><span class="chip">Nested sampling</span></div>
+          <div class="row-actions"><a class="btn" href="https://arxiv.org/abs/2604.22065" target="_blank" rel="noopener">Read paper</a></div>
+        </div>
+        <details>
+          <summary>Details</summary>
+          <div class="row-body">
+            <ul>
+              <li>Augmented iSAM2 with targeted nested sampling to refine the regions of a SLAM factor graph where Gaussian posterior assumptions fail.</li>
+              <li>Built a failure-detection trigger from condition numbers of joint marginal covariances, flagging unreliable regions before running expensive refinement.</li>
+              <li>Refined locally with the full nonlinear likelihood, with a gate that blocks updates that would degrade multimodal cases.</li>
+              <li>On range-only SLAM with wrong data associations: high-precision failure detection and consistent likelihood gains at lower cost than exhaustive non-Gaussian inference.</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>Localization and perception</h3>
+      <div class="row">
+        <div class="row-head">
+          <div>
+            <p class="row-title">Multi-Sensor Fusion for Robot Localization</p>
+            <div class="row-kind">Drift cut from 45.8% to 3.1%</div>
+          </div>
+          <div class="chips"><span class="chip">ROS2</span><span class="chip">C++</span><span class="chip">Python</span><span class="chip">EKF</span><span class="chip">Visual odometry</span><span class="chip">GPS/IMU</span></div>
+          <!-- TODO: replace # with your project report link -->
+          <div class="row-actions"><a class="btn" href="#" target="_blank" rel="noopener">Project report</a></div>
+        </div>
+        <details>
+          <summary>Details</summary>
+          <div class="row-body">
+            <ul>
+              <li>ROS2 localization pipeline fusing u-blox GPS, IMU and a monocular camera, with timestamp sync and TF transforms across indoor and outdoor runs.</li>
+              <li>IMU-aided visual odometry with quaternion orientation correction, reducing cumulative trajectory drift from 45.8% to 3.1%.</li>
+              <li>Benchmarked complementary filter vs. EKF using covariance and innovation-residual analysis under sparse, intermittent GPS.</li>
+              <li>SVD-based Procrustes alignment and scale correction to recover accuracy after sensor dropouts and estimator resets.</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+
+      <div class="row">
+        <div class="row-head">
+          <div>
+            <p class="row-title">SignSync: Seamless ASL to English</p>
+            <div class="row-kind">Real-time gesture recognition to an embedded display</div>
+          </div>
+          <div class="chips"><span class="chip">OpenCV</span><span class="chip">MediaPipe</span><span class="chip">LSTM</span><span class="chip">TensorFlow</span><span class="chip">Django</span><span class="chip">Arduino</span></div>
+          <!-- TODO: replace # with your project report link -->
+          <div class="row-actions"><a class="btn" href="#" target="_blank" rel="noopener">Project report</a></div>
+        </div>
+        <details>
+          <summary>Details</summary>
+          <div class="row-body">
+            <ul>
+              <li>Live hand and body pose tracking with OpenCV and MediaPipe, extracting spatial keypoints and motion features from camera streams.</li>
+              <li>Preprocessing pipeline for landmark normalization, sequence segmentation and labeled dataset generation as NumPy tensors.</li>
+              <li>Trained an LSTM sequence classifier with dropout and class balancing for consistent results across users and similar gestures.</li>
+              <li>Connected inference to a Django REST backend and a Bluetooth Arduino OLED that displays the translated text.</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>Robot hardware</h3>
+      <div class="row">
+        <div class="row-head">
+          <div>
+            <p class="row-title">ABU Robocon 2022: Competition Robot</p>
+            <div class="row-kind">Design, fabrication and integration</div>
+          </div>
+          <div class="chips"><span class="chip">SolidWorks</span><span class="chip">ANSYS</span><span class="chip">ROS</span><span class="chip">LiDAR</span><span class="chip">Raspberry Pi</span></div>
+          <div class="row-actions"></div>
+        </div>
+        <details>
+          <summary>Details</summary>
+          <div class="row-body">
+            <ul>
+              <li>Designed chassis, structure and mounts in SolidWorks, checking load paths with ANSYS stress analysis for high-impact competition use.</li>
+              <li>Integrated LiDAR, encoders, motors, controllers, Arduino and Raspberry Pi with ROS-based control software.</li>
+              <li>Machined, assembled and iterated mechanical and electrical subsystems, fixing alignment and tolerance issues through full-system testing.</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <h2 class="display">Experience</h2>
+    <div class="group">
+      <div class="row" style="border-top:2px solid var(--ink)">
+        <div class="row-head">
+          <div>
+            <p class="row-title">Robotics Intern, Kitolit Technologies</p>
+            <div class="row-kind">Hyderabad, India. Jun – Oct 2024</div>
+          </div>
+          <div class="chips"><span class="chip">Raspberry Pi</span><span class="chip">Arduino</span><span class="chip">OpenCV</span><span class="chip">UART/I2C</span><span class="chip">SolidWorks</span></div>
+          <div class="row-actions"></div>
+        </div>
+        <details>
+          <summary>Details</summary>
+          <div class="row-body">
+            <ul>
+              <li>Built indoor mobile robot prototypes with IMU, encoders, ultrasonic sensors and DC motors for autonomous navigation demos.</li>
+              <li>Integrated sensors over UART and I2C and wrote an OpenCV pipeline for real-time obstacle avoidance under changing indoor conditions.</li>
+              <li>Designed chassis, sensor mounts and FDM parts in SolidWorks; logged camera, IMU and encoder data to diagnose hardware and navigation failures.</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>Education</h3>
+      <div class="row">
+        <div class="row-head">
+          <div>
+            <p class="row-title">MS Robotics, Northeastern University</p>
+            <div class="row-kind">Boston. Sep 2025 – Dec 2027. GPA 3.67</div>
+          </div>
+          <div class="chips"><span class="chip">Robot dynamics</span><span class="chip">Control</span><span class="chip">Mobile robots</span><span class="chip">Reinforcement learning</span><span class="chip">NLP</span></div>
+          <div class="row-actions"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-head">
+          <div>
+            <p class="row-title">B.Tech ECE (AI &amp; Cybernetics), VIT Bhopal</p>
+            <div class="row-kind">India. Sep 2020 – Apr 2024</div>
+          </div>
+          <div class="chips"><span class="chip">Embedded systems</span><span class="chip">Signal processing</span><span class="chip">Control theory</span><span class="chip">DSA</span></div>
+          <div class="row-actions"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <h2 class="display">Skills</h2>
+    <dl class="skills">
+      <div><dt>Programming</dt><dd>Python, C++, MATLAB, Linux/Ubuntu</dd></div>
+      <div><dt>Robotics middleware</dt><dd>ROS1 Noetic, ROS2 Humble and Jazzy, RViz, sensor integration</dd></div>
+      <div><dt>Libraries</dt><dd>OpenCV, PCL, GTSAM, CasADi, Pinocchio</dd></div>
+      <div><dt>Simulation</dt><dd>Gazebo Classic and Harmonic, MuJoCo, Isaac Sim, Isaac Lab</dd></div>
+      <div><dt>Hardware</dt><dd>Arduino, Raspberry Pi, IMU, GPS, LiDAR, motion control</dd></div>
+      <div><dt>Design and prototyping</dt><dd>SolidWorks, ANSYS, 3D printing, rapid prototyping</dd></div>
+      <div><dt>Certifications</dt><dd>AWS Cloud Foundations, VLSI design methodologies</dd></div>
+    </dl>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="contact">
+    <h2 class="display">Contact</h2>
+    <p class="lede">Looking for robotics, perception and state estimation roles. The fastest way to reach me is email.</p>
+    <a class="big" href="mailto:dubey.sart@northeastern.edu">dubey.sart@northeastern.edu</a>
+    <div class="actions">
+      <!-- TODO: replace with your LinkedIn and GitHub URLs -->
+      <a class="btn" href="https://www.linkedin.com/in/YOUR-HANDLE" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn ghost" href="https://github.com/YOUR-USERNAME" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn ghost" href="resume.pdf" target="_blank" rel="noopener">Download résumé</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>© <span id="yr"></span> Sarthak Dubey</span>
+  <span>Boston, MA</span>
+</footer>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+const MOTION = document.documentElement.classList.contains('anim');
+
+/* ================= Hero: robot mapping a room with LiDAR ================= */
+(function(){
+  const c = document.getElementById('robot'), base = c.getContext('2d');
+  const c2 = document.getElementById('robotTop'), top = c2.getContext('2d');
+  let ctx = base;
+  // obstacles [x,y,w,h] and the robot's patrol route, as fractions of the hero
+  const OBS = [[.12,.18,.14,.10],[.42,.12,.08,.20],[.66,.22,.18,.08],[.78,.48,.08,.20],[.30,.52,.16,.07],[.55,.62,.12,.06]];
+  const WP  = [[.08,.35],[.30,.38],[.56,.40],[.72,.38],[.92,.32],[.92,.80],[.70,.85],[.48,.80],[.22,.72],[.06,.62]];
+  let W=0, H=0, k=1, rects=[], robot=null, pts=[], trail=[], wi=1, turret=0, dist=0, sweep=[], running=false, last=0;
+
+  function resize(){
+    const r = c.getBoundingClientRect(), d = Math.min(window.devicePixelRatio||1, 2);
+    const oW=W, oH=H; W=r.width; H=r.height;
+    c.width=c2.width=W*d; c.height=c2.height=H*d; base.setTransform(d,0,0,d,0,0); top.setTransform(d,0,0,d,0,0);
+    k = Math.max(.6, Math.min(1.3, W/1300));
+    rects = OBS.map(o=>[o[0]*W, o[1]*H, o[2]*W, o[3]*H]);
+    if(robot && oW){
+      const sx=W/oW, sy=H/oH;
+      robot.x*=sx; robot.y*=sy;
+      for(const p of pts){p[0]*=sx; p[1]*=sy}
+      for(const p of trail){p[0]*=sx; p[1]*=sy}
+    } else robot = {x:WP[0][0]*W, y:WP[0][1]*H, h:0};
+    draw();
+  }
+
+  function cast(x,y,a,max){
+    const dx=Math.cos(a), dy=Math.sin(a), m=3; let t=max, hit=false, v;
+    if(dx>0){v=(W-m-x)/dx; if(v<t){t=v;hit=true}} else if(dx<0){v=(m-x)/dx; if(v<t){t=v;hit=true}}
+    if(dy>0){v=(H-m-y)/dy; if(v<t){t=v;hit=true}} else if(dy<0){v=(m-y)/dy; if(v<t){t=v;hit=true}}
+    for(const [rx,ry,rw,rh] of rects){
+      const t1=(rx-x)/dx, t2=(rx+rw-x)/dx, t3=(ry-y)/dy, t4=(ry+rh-y)/dy;
+      const lo=Math.max(Math.min(t1,t2),Math.min(t3,t4)), hi=Math.min(Math.max(t1,t2),Math.max(t3,t4));
+      if(hi>=0 && lo<=hi && lo>0 && lo<t){t=lo;hit=true}
+    }
+    return [t,hit];
+  }
+
+  function step(dt){
+    const tx=WP[wi][0]*W, ty=WP[wi][1]*H;
+    let d = Math.atan2(ty-robot.y, tx-robot.x) - robot.h;
+    d = Math.atan2(Math.sin(d), Math.cos(d));
+    robot.h += Math.max(-2.4*dt, Math.min(2.4*dt, d));
+    const sp = 95*k*(1-Math.min(.65, Math.abs(d)*.8));
+    robot.x += Math.cos(robot.h)*sp*dt; robot.y += Math.sin(robot.h)*sp*dt; dist += sp*dt;
+    if(Math.hypot(tx-robot.x, ty-robot.y) < 34*k) wi = (wi+1) % WP.length;
+
+    const lt = trail[trail.length-1];
+    if(!lt || Math.hypot(lt[0]-robot.x, lt[1]-robot.y) > 7) { trail.push([robot.x,robot.y]); if(trail.length>160) trail.shift(); }
+
+    turret += dt*5.5;
+    const range = .38*Math.max(W,H);
+    sweep = [];
+    for(let j=0;j<12;j++){
+      const a = turret - j*.045, [t,hit] = cast(robot.x, robot.y, a, range);
+      sweep.push([a,t]);
+      if(hit) pts.push([robot.x+Math.cos(a)*t+(Math.random()-.5)*1.5, robot.y+Math.sin(a)*t+(Math.random()-.5)*1.5]);
+    }
+    if(pts.length>9000) pts.splice(0, pts.length-9000);
+  }
+
+  function rr(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+  function drawRobot(){
+    const {x,y,h} = robot, L=62*k, B=44*k;
+    ctx.save(); ctx.translate(x,y); ctx.rotate(h);
+    // headlight cone
+    const g = ctx.createLinearGradient(L/2,0,L/2+120*k,0);
+    g.addColorStop(0,'rgba(245,196,0,.18)'); g.addColorStop(1,'rgba(245,196,0,0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.moveTo(L/2,-B*.3); ctx.lineTo(L/2+120*k,-60*k); ctx.lineTo(L/2+120*k,60*k); ctx.lineTo(L/2,B*.3); ctx.fill();
+    // shadow
+    ctx.fillStyle='rgba(0,0,0,.4)'; rr(-L/2+3*k,-B/2+5*k,L,B,7*k); ctx.fill();
+    // wheels with moving treads
+    for(const wx of [-L*.3, L*.3]) for(const s of [-1,1]){
+      const cx=wx, cy=s*B/2, ww=15*k, wh=8*k;
+      ctx.fillStyle='#0E141B'; rr(cx-ww/2, cy-wh/2, ww, wh, 2*k); ctx.fill();
+      ctx.strokeStyle='rgba(201,204,198,.35)'; ctx.lineWidth=1;
+      const off = (dist % (5*k));
+      for(let q=-ww/2+off; q<ww/2; q+=5*k){ ctx.beginPath(); ctx.moveTo(cx+q, cy-wh/2+1); ctx.lineTo(cx+q, cy+wh/2-1); ctx.stroke(); }
+    }
+    // chassis
+    ctx.fillStyle='#F5C400'; rr(-L/2,-B/2,L,B,7*k); ctx.fill();
+    ctx.strokeStyle='rgba(27,36,48,.35)'; ctx.lineWidth=1; rr(-L/2+5*k,-B/2+5*k,L-16*k,B-10*k,4*k); ctx.stroke();
+    // front bumper + camera
+    ctx.fillStyle='#1B2430'; rr(L/2-5*k,-B/2+4*k,5*k,B-8*k,2*k); ctx.fill();
+    ctx.fillStyle='#C9CCC6'; ctx.beginPath(); ctx.arc(L/2-2.5*k,-5*k,1.6*k,0,7); ctx.arc(L/2-2.5*k,5*k,1.6*k,0,7); ctx.fill();
+    // LiDAR turret
+    ctx.fillStyle='#1B2430'; ctx.beginPath(); ctx.arc(-3*k,0,9*k,0,7); ctx.fill();
+    ctx.strokeStyle='#C9CCC6'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.strokeStyle='#F5C400'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(-3*k,0);
+    ctx.lineTo(-3*k+Math.cos(turret-h)*8*k, Math.sin(turret-h)*8*k); ctx.stroke();
+    ctx.restore();
+  }
+
+  function draw(){
+    if(!W) return;
+    ctx = base; ctx.clearRect(0,0,W,H); top.clearRect(0,0,W,H);
+    ctx.strokeStyle='rgba(201,204,198,.05)'; ctx.lineWidth=1; ctx.beginPath();
+    for(let g=0; g<W; g+=40){ ctx.moveTo(g+.5,0); ctx.lineTo(g+.5,H); }
+    for(let g=0; g<H; g+=40){ ctx.moveTo(0,g+.5); ctx.lineTo(W,g+.5); }
+    ctx.stroke();
+    // map built so far
+    ctx.fillStyle='rgba(201,204,198,.6)';
+    for(const p of pts) ctx.fillRect(p[0]-.9,p[1]-.9,1.8,1.8);
+    // moving parts go on the top layer, above the name
+    ctx = top;
+    // trail
+    if(trail.length>1){
+      ctx.setLineDash([4,6]); ctx.strokeStyle='rgba(245,196,0,.45)'; ctx.lineWidth=1.5; ctx.beginPath();
+      trail.forEach((p,i)=> i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])); ctx.lineTo(robot.x,robot.y); ctx.stroke(); ctx.setLineDash([]);
+    }
+    // LiDAR sweep
+    sweep.forEach(([a,t],j)=>{
+      ctx.strokeStyle=`rgba(245,196,0,${.4*(1-j/12)})`; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(robot.x,robot.y); ctx.lineTo(robot.x+Math.cos(a)*t, robot.y+Math.sin(a)*t); ctx.stroke();
+      ctx.fillStyle=`rgba(245,196,0,${1-j/12})`; ctx.fillRect(robot.x+Math.cos(a)*t-1.5, robot.y+Math.sin(a)*t-1.5, 3, 3);
+    });
+    drawRobot();
+    ctx = base;
+  }
+
+  function frame(now){
+    if(!running) return;
+    const dt = Math.min(.05, (now-(last||now))/1000); last=now;
+    step(dt); draw(); requestAnimationFrame(frame);
+  }
+  function start(){ if(!running){ running=true; last=0; requestAnimationFrame(frame); } }
+  function stop(){ running=false; }
+
+  resize();
+  window.addEventListener('resize', resize);
+  if(MOTION){
+    // only animate while the hero is on screen
+    new IntersectionObserver(([e])=> e.isIntersecting ? start() : stop()).observe(c);
+    document.addEventListener('visibilitychange', ()=> document.hidden ? stop() : start());
+  } else {
+    for(let n=0;n<1600;n++) step(1/30); draw();   // static, already-mapped frame
+  }
+})();
+
+/* ================= Load + scroll animations ================= */
+(function(){
+  const hero = document.querySelector('.hero');
+  const progress = document.querySelector('.progress');
+  if(!MOTION){ hero.classList.add('ready'); return; }
+
+  // headings: split lines into masks so they rise into view
+  document.querySelectorAll('section > h2.display').forEach(h=>{
+    h.innerHTML = `<span class="mask"><span>${h.textContent}</span></span>`;
+    h.setAttribute('data-split','');
+  });
+  document.querySelectorAll('[data-split]').forEach(h=> h.querySelectorAll('.mask').forEach((m,i)=> m.firstElementChild.style.setProperty('--m',i)));
+
+  // things that slide up as you scroll to them, staggered within each block
+  const sel = '.lede, .row, .skills > div, .contact .actions, .chips';
+  document.querySelectorAll('section').forEach(sec=>{
+    sec.querySelectorAll(sel).forEach((el,i)=>{
+      if(el.classList.contains('chips')) return;
+      el.setAttribute('data-reveal',''); el.style.setProperty('--i', Math.min(i,8));
+    });
+  });
+
+  const io = new IntersectionObserver(es=>es.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+  }), {threshold:.12, rootMargin:'0px 0px -8% 0px'});
+  document.querySelectorAll('[data-reveal], section [data-split], .group h3, .contact .big').forEach(el=>io.observe(el));
+
+  // hero intro on page load
+  requestAnimationFrame(()=>{ hero.classList.add('ready'); hero.querySelector('h1').classList.add('in'); });
+
+  // marquee: drifts on its own, speeds up and reverses with your scrolling
+  const track = document.querySelector('.track');
+  let off=0, lastY=scrollY, vel=0, lastT=performance.now();
+  const name = hero.querySelector('h1'), canvas = document.getElementById('robot');
+  function loop(now){
+    const dt = Math.min(.05,(now-lastT)/1000); lastT=now;
+    const y = scrollY, dy = y-lastY; lastY=y;
+    vel += (dy*1.2 - vel)*.15;
+    off += 60*dt + vel;
+    const half = track.scrollWidth/2;
+    off = ((off % half) + half) % half;
+    track.style.transform = `translateX(${-off}px)`;
+
+    // hero parallax: name lifts and the scene dims as the page turns
+    const hh = hero.offsetHeight, p = Math.min(1, Math.max(0, y/hh));
+    name.style.transform = `translateY(${-p*80}px)`;
+    canvas.style.opacity = 1 - p*.6;
+
+    // scroll progress bar
+    const max = document.documentElement.scrollHeight - innerHeight;
+    progress.style.transform = `scaleX(${max>0 ? y/max : 0})`;
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
